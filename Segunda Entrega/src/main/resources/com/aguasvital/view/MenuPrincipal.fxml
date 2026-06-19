@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.aguasvital.controller.MenuPrincipalController"
+            prefWidth="900" prefHeight="620">
+    <top>
+        <HBox spacing="16" style="-fx-padding: 18; -fx-background-color: #eaf3f8;">
+            <children>
+                <Label text="Aguas Vital" style="-fx-font-size: 22px; -fx-font-weight: bold;" />
+                <Label text="Usuario:" />
+                <Label fx:id="lblUsuario" />
+                <Label text="Cargo:" />
+                <Label fx:id="lblCargo" />
+            </children>
+        </HBox>
+    </top>
+    <center>
+        <VBox spacing="12" style="-fx-padding: 28;">
+            <children>
+                <Button fx:id="btnRegistrarCliente" text="Registrar Cliente" onAction="#abrirRegistrarCliente" prefWidth="260" />
+                <Button fx:id="btnRegistrarPedido" text="Registrar Pedido" onAction="#abrirRegistrarPedido" prefWidth="260" />
+                <Button fx:id="btnCancelarPedido" text="Cancelar Pedido" onAction="#abrirCancelarPedido" prefWidth="260" />
+                <Button fx:id="btnActualizarPedido" text="Actualizar Pedido" onAction="#abrirActualizarPedido" prefWidth="260" />
+                <Button fx:id="btnRegistrarPendientes" text="Registrar Pendientes" onAction="#abrirRegistrarPendientes" prefWidth="260" />
+                <Button fx:id="btnEfectuarTraslado" text="Efectuar Traslado" onAction="#abrirEfectuarTraslado" prefWidth="260" />
+                <Button fx:id="btnGenerarRendicion" text="Generar Rendicion" onAction="#abrirGenerarRendicion" prefWidth="260" />
+                <Button fx:id="btnGestionarPrecios" text="Gestionar Precios" onAction="#abrirGestionarPrecios" prefWidth="260" />
+                <Button fx:id="btnConsultarPedidos" text="Consultar Pedidos" onAction="#abrirConsultarPedidos" prefWidth="260" />
+            </children>
+        </VBox>
+    </center>
+    <bottom>
+        <HBox style="-fx-padding: 18;" alignment="CENTER_RIGHT">
+            <children>
+                <Button text="Cerrar sesion" onAction="#cerrarSesion" />
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.aguasvital.controller.ActualizarPedidoController"
+            prefWidth="950" prefHeight="680">
+    <fx:define>
+        <ToggleGroup fx:id="estadoGroup" />
+        <ToggleGroup fx:id="pagoGroup" />
+    </fx:define>
+    <top>
+        <HBox spacing="12" style="-fx-padding: 16; -fx-background-color: #eaf3f8;">
+            <children>
+                <Label text="Actualizar Pedido" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+            </children>
+        </HBox>
+    </top>
+    <center>
+        <VBox spacing="12" style="-fx-padding: 18;">
+            <children>
+                <HBox spacing="10">
+                    <children>
+                        <TextField fx:id="txtNumeroPedido" promptText="Numero de pedido" />
+                        <Button text="Buscar" onAction="#buscarPedido" />
+                        <Label fx:id="lblMensaje" textFill="#b00020" />
+                    </children>
+                </HBox>
+                <GridPane hgap="10" vgap="8">
+                    <children>
+                        <Label text="Numero" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                        <TextField fx:id="txtNumero" editable="false" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                        <Label text="Cliente" GridPane.rowIndex="0" GridPane.columnIndex="2" />
+                        <TextField fx:id="txtCliente" editable="false" GridPane.rowIndex="0" GridPane.columnIndex="3" />
+                        <Label text="Direccion" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                        <TextField fx:id="txtDireccion" editable="false" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                        <Label text="Barrio" GridPane.rowIndex="1" GridPane.columnIndex="2" />
+                        <TextField fx:id="txtBarrio" editable="false" GridPane.rowIndex="1" GridPane.columnIndex="3" />
+                        <Label text="Zona" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                        <TextField fx:id="txtZona" editable="false" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                        <Label text="Fecha emision" GridPane.rowIndex="2" GridPane.columnIndex="2" />
+                        <TextField fx:id="txtFechaEmision" editable="false" GridPane.rowIndex="2" GridPane.columnIndex="3" />
+                        <Label text="Fecha entrega" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                        <TextField fx:id="txtFechaEntrega" editable="false" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                        <Label text="Total" GridPane.rowIndex="3" GridPane.columnIndex="2" />
+                        <TextField fx:id="txtTotal" editable="false" GridPane.rowIndex="3" GridPane.columnIndex="3" />
+                        <Label text="Estado actual" GridPane.rowIndex="4" GridPane.columnIndex="0" />
+                        <TextField fx:id="txtEstadoActual" editable="false" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+                    </children>
+                </GridPane>
+                <TableView fx:id="tblDetalles" prefHeight="160">
+                    <columns>
+                        <TableColumn fx:id="colProducto" text="Producto" prefWidth="340" />
+                        <TableColumn fx:id="colCantidad" text="Cantidad" prefWidth="120" />
+                        <TableColumn fx:id="colPrecio" text="Precio unitario" prefWidth="160" />
+                        <TableColumn fx:id="colSubtotal" text="Subtotal" prefWidth="160" />
+                    </columns>
+                </TableView>
+                <HBox fx:id="boxEstado" spacing="16">
+                    <children>
+                        <RadioButton fx:id="rbEntregado" text="ENTREGADO" toggleGroup="$estadoGroup" />
+                        <RadioButton fx:id="rbNoEntregado" text="NO_ENTREGADO" toggleGroup="$estadoGroup" />
+                    </children>
+                </HBox>
+                <HBox fx:id="boxMetodoPago" spacing="16">
+                    <children>
+                        <RadioButton fx:id="rbContado" text="Pago contado" toggleGroup="$pagoGroup" />
+                        <RadioButton fx:id="rbElectronico" text="Pago electronico" toggleGroup="$pagoGroup" />
+                    </children>
+                </HBox>
+                <HBox fx:id="boxContado" spacing="10">
+                    <children>
+                        <Label text="Monto recibido" />
+                        <TextField fx:id="txtMontoRecibido" promptText="Monto recibido" />
+                    </children>
+                </HBox>
+                <HBox fx:id="boxElectronico" spacing="10">
+                    <children>
+                        <Label text="Entidad" />
+                        <TextField fx:id="txtEntidadPago" promptText="Entidad" />
+                        <Label text="Numero operacion" />
+                        <TextField fx:id="txtNroOperacion" promptText="Nro operacion" />
+                    </children>
+                </HBox>
+                <TextArea fx:id="txtObservaciones" promptText="Observaciones o motivo de no entrega" prefRowCount="3" />
+            </children>
+        </VBox>
+    </center>
+    <bottom>
+        <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 16;">
+            <children>
+                <Button fx:id="btnConfirmar" text="Confirmar actualizacion" onAction="#confirmarActualizacion" />
+                <Button text="Limpiar" onAction="#limpiar" />
+                <Button text="Volver al menu" onAction="#volverMenu" />
+            </children>
+        </HBox>
+    </bottom>
+</BorderPane>
