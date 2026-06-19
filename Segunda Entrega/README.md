@@ -124,7 +124,7 @@ Si falla → `ROLLBACK`.
 
 ---
 
-### UC08 — Generar Rendicion Diaria (Administrativo)
+### UC02 — Generar Rendicion Diaria (Administrativo)
 
 **Paso 1 — Inicializar vista**
 `GenerarRendicionController.java:38` — `initialize()`
