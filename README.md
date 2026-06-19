@@ -44,13 +44,14 @@ Una zona está conformada por uno o más barrios.
 Un barrio se encuentra dentro de una única zona.
 El domicilio de entrega del pedido es el domicilio del cliente.
 Cada factura puede ser pagada con una única forma de pago.
-Requisitos de aprobación
+
+## Requisitos de aprobación
 
 La realización y entrega del trabajo práctico es condición de aprobación de la materia.
 
 Las entregas del TP por parte de los alumnos es grupal y consisten en:
 
-Primera entrega
+## Primera entrega
 
 Un proyecto en StarUML (de tipo Rational) con los modelos y diagramas solicitados, los cuales son:
 
@@ -59,7 +60,8 @@ Diagrama de Casos de Uso de todo el sistema.
 Descripción de 2 casos de uso principales.
 Diagramas de colaboración o secuencia de los 2 casos de uso principales seleccionados en el paso anterior.
 Además de la descripción de dichos casos de uso principales con plantilla utilizada en clase y en formato de documento (.odt, .doc o .docx).
-Segunda entrega
+
+## Segunda entrega
 
 Un proyecto Maven con la implementación funcional solicitada, lo que implica:
 
