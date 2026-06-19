@@ -4,6 +4,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Opcional - para futura implementacion.
+ * Actualmente el sistema registra pedidos y pagos sin generar facturas.
+ * Esta clase esta lista para usarse cuando se requiera emision de comprobantes.
+ */
 public class Factura {
     private final String nroFactura;
     private final Pedido pedido;
