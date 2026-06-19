@@ -1,115 +1,97 @@
-# Aguas Vital - Sistema de Gestion de Pedidos
+# Mapeo Diagrama StarUML <-> Codigo Fuente
 
-Aplicacion JavaFX con persistencia SQLite para la gestion de pedidos de una distribuidora de agua. Desarrollada como segunda entrega de la materia **Diseno Orientado a Objetos**.
-
-## Requisitos
-
-- Java 21+
-- Maven 3.9+
-- JavaFX 21.0.5 (incluido via Maven)
-
-## Como ejecutar
-
-```bash
-mvn clean javafx:run
-```
-
-## Como ejecutar tests
-
-```bash
-mvn test
-```
-
-## Credenciales de prueba
-
-| Usuario       | Password | Rol                        |
-|---------------|----------|----------------------------|
-| operadora     | 1234     | OPERADORA                  |
-| administrativo| 1234     | ENCARGADO_ADMINISTRATIVO   |
-| distribuidor  | 1234     | DISTRIBUIDOR               |
-| presidente    | 1234     | PRESIDENTE                 |
+Este documento vincula cada clase del diagrama de clases conceptual (StarUML) con su implementacion real en el codigo.
+El diagrama es intencionalmente simple para facilitar la comprension de la arquitectura.
 
 ---
 
-## Flujo de la aplicacion
+## Modelo de Dominio
 
-### 1. Login
-`LoginController` valida usuario/password contra `DatosSistema`. Si es correcto, almacena el usuario en `SesionUsuario` (Singleton) y redirige al menu principal con botones filtrados segun el rol.
-
-### 2. Menu Principal
-`MenuPrincipalController` carga los botones de acuerdo al cargo del usuario logueado. Usa el Singleton `SesionUsuario` para conocer el rol actual.
-
-### 3. Registrar Pedido (UC01)
-`RegistrarPedidoController` + `PedidoService`:
-- Busca el cliente por numero de documento
-- Agrega/quita productos al pedido
-- Verifica que el cliente tenga barrio/zona registrados
-- Confirma el pedido, lo persiste via `PedidoDAOImpl` (SQLite) y lo registra en `DatosSistema`
-
-### 4. Consultar Pedidos
-`ConsultarPedidosController` muestra todos los pedidos con filtros por estado. Los datos se cargan desde la base de datos via `DatosSistema`.
-
-### 5. Registrar Pendientes
-`RegistrarPendientesController` lista pedidos pendientes y permite reasignar distribuidor. Los distribuidores se cargan desde la BD.
-
-### 6. Efectuar Traslado
-`EfectuarTrasladoController` lista pedidos pendientes para que el distribuidor marque como entregado o no entregado.
-
-### 7. Gestionar Precios
-`GestionarPreciosController` permite modificar precios de productos. Los datos se cargan desde SQLite.
-
-### 8. Generar Rendicion
-`GenerarRendicionController` + `RendicionService` genera un reporte diario de ingresos separando pagos en efectivo y electronicos, excluyendo pedidos pendientes y no entregados.
-
-### 9. Cancelar Pedido
-`CancelarPedidoController` busca un pedido por numero y permite cancelarlo (funcionalidad en desarrollo).
-
-### 10. Registrar Cliente
-`RegistrarClienteController` carga zonas y barrios desde la BD y filtra barrios dinamicamente segun la zona seleccionada.
+| Clase en StarUML | Archivo(s) en codigo | Notas |
+|---|---|---|
+| `Persona` | `src/main/java/com/aguasvital/model/Persona.java` | Clase abstracta. Base de la herencia de `Cliente` y `Empleado` |
+| `Cliente` | `src/main/java/com/aguasvital/model/Cliente.java` | Hereda de `Persona`. Agrega `direccion`, `telefono`, `barrio` |
+| `Empleado` | `src/main/java/com/aguasvital/model/Empleado.java` | Hereda de `Persona`. Usa el enum `Cargo` para el rol (OPERADORA, DISTRIBUIDOR, etc.) |
+| `Cargo` (enum) | `src/main/java/com/aguasvital/model/Cargo.java` | Enum con 4 valores: OPERADORA, ENCARGADO_ADMINISTRATIVO, DISTRIBUIDOR, PRESIDENTE |
+| `Barrio` | `src/main/java/com/aguasvital/model/Barrio.java` | Tiene atributo `zona: Zona` |
+| `Zona` | `src/main/java/com/aguasvital/model/Zona.java` | Identificador `idZona` + `nombre` |
+| `Pedido` | `src/main/java/com/aguasvital/model/Pedido.java` | Usa State (`estadoActual: EstadoPedido`) y Strategy (`metodoPago: MetodoPago`) |
+| `DetallePedido` | `src/main/java/com/aguasvital/model/DetallePedido.java` | Tiene `producto: Producto`, `cantidad`, `precioUnitarioHistorico` |
+| `Producto` | `src/main/java/com/aguasvital/model/Producto.java` | Contiene lista de `Precio` historicos |
+| `Precio` | `src/main/java/com/aguasvital/model/Precio.java` | `valor`, `fechaDesde`, `fechaHasta` (nullable) |
+| `Envase` | `src/main/java/com/aguasvital/model/Envase.java` | `tipoEnvase` (Bidon/Sifon) + `capacidad` (6/10/12/20/2 litros) |
+| `Factura` | `src/main/java/com/aguasvital/model/Factura.java` | **Opcional — para futura implementacion.** No se genera actualmente |
+| `DetalleFactura` | `src/main/java/com/aguasvital/model/DetalleFactura.java` | **Opcional — para futura implementacion.** Soporte para Factura |
 
 ---
 
-## Conceptos de Diseno Orientado a Objetos aplicados
+## Patrones de Diseno
 
-### Principios SOLID
+### State Pattern
+| Rol | Clase en diagrama | Clase en codigo |
+|---|---|---|
+| Interface | `EstadoPedido` | `src/main/java/com/aguasvital/state/EstadoPedido.java` |
+| Estado Pendiente | `EstadoPendiente` | `src/main/java/com/aguasvital/state/EstadoPendiente.java` |
+| Estado Entregado | `EstadoEntregado` | `src/main/java/com/aguasvital/state/EstadoEntregado.java` |
+| Estado No Entregado | `EstadoNoEntregado` | `src/main/java/com/aguasvital/state/EstadoNoEntregado.java` |
+| Contexto | `Pedido` | `Pedido.estadoActual` controla las transiciones |
 
-| Principio | Donde se aplica |
-|-----------|-----------------|
-| **S**ingle Responsibility | Cada clase tiene una unica responsabilidad: `PedidoService` solo orquesta reglas de negocio, `PedidoDAOImpl` solo persiste, `RegistrarPedidoController` solo maneja la UI |
-| **O**pen/Closed | Las estrategias de pago (`MetodoPago`) estan abiertas a extension (nuevo metodo de pago) pero cerradas a modificacion |
-| **L**iskov Substitution | `EstadoPendiente`, `EstadoEntregado`, `EstadoNoEntregado` pueden sustituir a `EstadoPedido` sin alterar el comportamiento del sistema |
-| **I**nterface Segregation | `Dao<T>` es una interfaz pequena y generica con solo 5 metodos esenciales |
-| **D**ependency Inversion | `PedidoService` depende de la abstraccion `PedidoRepository`, no de una implementacion concreta |
+**Implementado en codigo:** `Pedido.marcarEntregado()` y `marcarNoEntregado()` delegan al estado actual, que valida si la transicion es valida. Un pedido entregado no puede volver a pendiente.
 
-### Patrones de Diseno
+### Strategy Pattern
+| Rol | Clase en diagrama | Clase en codigo |
+|---|---|---|
+| Interface | `MetodoPago` | `src/main/java/com/aguasvital/strategy/MetodoPago.java` |
+| Pago contado | `PagoContado` | `src/main/java/com/aguasvital/strategy/PagoContado.java` |
+| Pago electronico | `PagoElectronico` | `src/main/java/com/aguasvital/strategy/PagoElectronico.java` |
+| Contexto | `Pedido` | `Pedido.metodoPago` delega el procesamiento |
 
-#### Singleton
-`DatosSistema` y `DatabaseManager` usan Singleton. Solo existe una instancia en toda la aplicacion, accesible via `getInstancia()`. `DatabaseManager` maneja la conexion unica a SQLite, y `DatosSistema` es la fuente central de datos en memoria.
+**Implementado en codigo:** `Pedido.procesarPago()` llama a `metodoPago.procesarPago(total)`. Cada estrategia implementa su propia logica de validacion.
 
-#### State
-El ciclo de vida de un `Pedido` se modela con State. `EstadoPedido` es la interfaz; `EstadoPendiente`, `EstadoEntregado` y `EstadoNoEntregado` son las implementaciones. Cada estado controla las transiciones: un pedido pendiente puede marcarse como entregado o no entregado, pero uno entregado no puede volver a pendiente.
+---
 
-#### Strategy
-Los metodos de pago usan Strategy. `MetodoPago` es la interfaz; `PagoContado` y `PagoElectronico` implementan `procesarPago()`. El `Pedido` delega el procesamiento del pago a la estrategia seleccionada, permitiendo cambiar el algoritmo en tiempo de ejecucion.
+## Infraestructura (no modelada en StarUML)
 
-#### MVC (Model-View-Controller)
-La aplicacion sigue MVC:
-- **Model**: Clases del paquete `model` (`Pedido`, `Cliente`, `Producto`, etc.)
-- **View**: Archivos FXML en `resources/com/aguasvital/view/`
-- **Controller**: Clases en `controller/` (`RegistrarPedidoController`, `LoginController`, etc.)
+Estas clases son parte de la arquitectura pero no aparecen en el diagrama conceptual para mantenerlo simple.
 
-#### DAO (Data Access Object)
-`Dao<T>` es la interfaz generica con CRUD (`buscar`, `listarTodos`, `insertar`, `modificar`, `borrar`). `ClienteDAOImpl` y `PedidoDAOImpl` implementan la capa de persistencia con SQLite, aislando la logica de negocio del acceso a datos.
+### Capa de Persistencia
+| Clase | Funcion | Patron |
+|---|---|---|
+| `dao/DatabaseManager.java` | Conexion Singleton a SQLite. Carga el esquema al iniciar la app | **Singleton** |
+| `dao/Dao.java` | Interfaz generica con CRUD: `buscar`, `listarTodos`, `insertar`, `modificar`, `borrar` | **DAO generico** |
+| `dao/FabricaDAO.java` | Crea la implementacion DAO adecuada segun el tipo de DTO. Ej: `fabricar(PedidoDTO.class)` devuelve `PedidoDAOImpl` | **Factory Method** |
+| `dao/ClienteDAOImpl.java` | Implementa `Dao<ClienteDTO>` contra SQLite | DAO concreto |
+| `dao/PedidoDAOImpl.java` | Implementa `Dao<PedidoDTO>` con transacciones (pedido + batch de detalles) | DAO concreto |
+| `dto/ClienteDTO.java` | DTO para transporte de datos de cliente entre capas | **DTO** |
+| `dto/PedidoDTO.java` | DTO para transporte de pedido + detalles | DTO |
+| `dto/DetallePedidoDTO.java` | DTO para cada linea de detalle (usado dentro de PedidoDTO) | DTO |
 
-#### DTO (Data Transfer Object)
-Los DTOs (`ClienteDTO`, `PedidoDTO`, `DetallePedidoDTO`, etc.) separan los datos persistidos del modelo de dominio. Los DAOs trabajan con DTOs, y `DatosSistema` los convierte a objetos del modelo.
+### Capa de Negocio
+| Clase | Funcion | Patron |
+|---|---|---|
+| `repository/DatosSistema.java` | Singleton que carga toda la BD en memoria (zonas, barrios, productos, precios, clientes, empleados, pedidos) y los expone a los controllers via getters. Tambien persiste cambios via DAOs | **Singleton** |
+| `repository/PedidoRepository.java` | Wrapper sobre DatosSistema para operaciones con pedidos | Repository |
+| `service/PedidoService.java` | Orquesta el registro de pedidos con validaciones de negocio | **Service Layer** |
+| `service/RendicionService.java` | Genera la rendicion diaria separando pagos contado y electronicos | Service Layer |
+| `service/RendicionDiaria.java` | Clase de datos que encapsula el resultado de una rendicion | DTO de salida |
 
-#### Factory Method
-`FabricaDAO.fabricar(Class<T>)` es un Factory Method que crea la implementacion DAO adecuada segun la clase DTO recibida. Oculta la logica de creacion y permite centralizar cambios.
+### Capa de Presentacion (MVC)
+| Componente | Archivos | Funcion |
+|---|---|---|
+| **Vistas (FXML)** | 11 archivos en `resources/com/aguasvital/view/` | Interfaces de usuario construidas con SceneBuilder |
+| **Controladores** | 10 clases en `controller/` (Login, MenuPrincipal, RegistrarPedido, ActualizarPedido, CancelarPedido, RegistrarCliente, RegistrarPendientes, EfectuarTraslado, GenerarRendicion, GestionarPrecios, ConsultarPedidos) | Manejan eventos de UI y orquestan la logica |
+| **Utilidades** | `util/Navegador.java` — cambio de vistas; `util/SesionUsuario.java` — sesion del usuario logueado | Soporte transversal |
 
-### Relaciones entre clases
+---
 
-- **Composicion**: `Pedido` contiene una lista de `DetallePedido`. Si el pedido se elimina, los detalles tambien.
-- **Agregacion**: `DatosSistema` mantiene listas de `Zona`, `Barrio`, `Cliente`, `Producto`, `Pedido` y `Empleado`. Estos objetos existen independientemente del singleton.
-- **Herencia**: `Cliente` y `Empleado` extienden `Persona`. Comparten atributos comunes (nombre, apellido, tipoDoc, nroDoc, razonSocial).
-- **Interfaces**: `Dao<T>` es implementada por `ClienteDAOImpl` y `PedidoDAOImpl`. `EstadoPedido` es implementada por los tres estados concretos. `MetodoPago` es implementada por las dos estrategias de pago.
+## Resumen de Patrones
+
+| Patron | Donde se implementa | Estado |
+|---|---|---|
+| **State** | `state/*.java` + `Pedido.estadoActual` | Implementado en codigo |
+| **Strategy** | `strategy/*.java` + `Pedido.metodoPago` | Implementado en codigo |
+| **Singleton** | `DatabaseManager`, `DatosSistema`, `SesionUsuario` | Implementado en codigo |
+| **DAO** | `Dao<T>` + `ClienteDAOImpl` + `PedidoDAOImpl` | Implementado en codigo |
+| **DTO** | `dto/*.java` | Implementado en codigo |
+| **Factory Method** | `FabricaDAO.fabricar()` | Implementado en codigo |
+| **MVC** | FXML (View) + Controller + Model | Implementado en codigo |
